@@ -66,10 +66,10 @@ def document(lang, page, title, description, body):
     schema = {'@context': 'https://schema.org', '@type': 'Person', 'name': 'DQR-Happy', 'url': ORIGIN, 'sameAs': [PROFILE['github']], 'email': PROFILE['email'], 'knowsAbout': ['GPU profiling', 'AI infrastructure', 'LLM inference', 'Heterogeneous computing']}
     return f'''<!doctype html>
 <html lang="{'en' if lang == 'en' else 'zh-CN'}" class="no-js"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark">
-<title>{esc(title)}</title><meta name="description" content="{esc(description)}"><meta name="author" content="DQR-Happy"><meta name="theme-color" content="#f6f7f2">
+<title>{esc(title)}</title><meta name="description" content="{esc(description)}"><meta name="author" content="DQR-Happy"><meta name="theme-color" content="#f6f5f8">
 <link rel="canonical" href="{ORIGIN}{path}"><link rel="alternate" hreflang="{'zh-CN' if lang == 'en' else 'en'}" href="{ORIGIN}{alternate}"><link rel="alternate" hreflang="{'en' if lang == 'en' else 'zh-CN'}" href="{ORIGIN}{path}"><link rel="alternate" hreflang="x-default" href="{ORIGIN}{url('zh', page)}">
 <meta property="og:type" content="website"><meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(description)}"><meta property="og:url" content="{ORIGIN}{path}"><meta property="og:site_name" content="DQR-Happy"><meta name="twitter:card" content="summary">
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/assets/site.css"><script src="/assets/site.js" defer></script>
+<link rel="icon" href="/assets/favicon.svg?v=slate-lilac-1" type="image/svg+xml"><link rel="stylesheet" href="/assets/site.css?v=slate-lilac-1"><script src="/assets/site.js?v=slate-lilac-1" defer></script>
 <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False)}</script></head><body>{header(lang, page)}<main id="main" class="wrap">{body}</main>{footer(lang)}</body></html>'''
 
 
@@ -89,7 +89,7 @@ def diagram(lang):
 <path d="M220 133v29M216 158l4 5 4-5" fill="none" class="diagram-accent" stroke-width="1.5"/>
 <rect x="42" y="174" width="118" height="73" class="diagram-fill diagram-accent"/>
 <text x="59" y="201" class="diagram-small">REFERENCE</text><text x="59" y="226" class="diagram-text">SM / CTA</text>
-<rect x="175" y="174" width="223" height="73" class="diagram-paper diagram-accent"/>
+<rect x="175" y="174" width="223" height="73" class="diagram-residual"/>
 <text x="193" y="201" class="diagram-small">EXACT RESIDUALS</text><text x="193" y="226" class="diagram-text">δ + preserved fields</text>
 <path d="M101 248v17h185v-17" class="diagram-accent" fill="none"/>
 <text x="42" y="309" class="diagram-small">CHECK → ENCODE / RAW FALLBACK</text>

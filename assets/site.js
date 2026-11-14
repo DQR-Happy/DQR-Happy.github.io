@@ -8,6 +8,8 @@
   try { preference = localStorage.getItem('qd-theme'); } catch (_) { /* storage optional */ }
   function applyTheme(dark) {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    const browserColor = document.querySelector('meta[name="theme-color"]');
+    if (browserColor) browserColor.content = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
     if (themeButton) {
       themeButton.setAttribute('aria-label', english ? (dark ? 'Switch to light theme' : 'Switch to dark theme') : (dark ? '切换浅色主题' : '切换深色主题'));
       themeButton.setAttribute('aria-pressed', String(dark));
