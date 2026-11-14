@@ -1,0 +1,49 @@
+{
+  "name": "Qirui Deng",
+  "name_zh": "邓骐睿",
+  "email": "dengqirui@mails.guet.edu.cn",
+  "github": "https://github.com/DQR-Happy",
+  "updated": "2026-11-15",
+  "paper": {
+    "title": "Execution-Reference Encoding and Recovery-Aware Collection for GPU Profiling",
+    "authors": "Qirui Deng, Yongxian Fan, Yongwei Zhang, Zuwen Lai",
+    "venue": "ISPA 2026",
+    "status_zh": "已录用",
+    "status_en": "Accepted",
+    "site": "https://dengqirui.me/ERETrace/",
+    "code": "https://github.com/DQR-Happy/ERETrace",
+    "release": "https://github.com/DQR-Happy/ERETrace/releases/tag/v1.0.0"
+  },
+  "projects": [
+    {
+      "name": "ERETrace", "category": "systems", "kind": "01 / GPU observability", "state_zh": "ISPA 2026 · v1.0.0", "state_en": "ISPA 2026 · v1.0.0",
+      "title_zh": "让细粒度 GPU 追踪，成为可负担的日常工具。", "title_en": "Making fine-grained GPU traces practical.",
+      "desc_zh": "利用执行上下文中的参考关系，无损表示细粒度记录；将编码、受检 raw 回退与有界异步采集结合，在完整推理过程中降低采集成本。",
+      "desc_en": "Lossless execution-reference encoding, checked raw fallback, and bounded asynchronous collection reduce the cost of fine-grained tracing during complete inference requests.",
+      "tags": ["CUDA", "C/C++", "Lossless tracing", "Systems research"],
+      "url": "https://dengqirui.me/ERETrace/", "code": "https://github.com/DQR-Happy/ERETrace",
+      "items_zh": ["SM / CTA 参考编码与精确恢复", "完整请求计时与 trace 文件体积评估", "复现配置、公开数据与独立正确性验证"],
+      "items_en": ["SM / CTA references and exact recovery", "Complete-request latency and trace-file evaluation", "Reproduction configs, public data, and separate correctness checks"]
+    },
+    {
+      "name": "HeteroQuantServeBench", "category": "inference", "kind": "02 / Inference engineering", "state_zh": "持续开发", "state_en": "In development",
+      "title_zh": "从算子到服务，组织可追溯的推理优化。", "title_en": "An evidence trail from kernels to serving.",
+      "desc_zh": "面向 CUDA 与 Ascend/CANN 的推理实验项目。围绕模型基线、算子替换、量化、KV cache、运行时与原生推理引擎，连接 Web 工作台和真实运行记录。",
+      "desc_en": "An inference experimentation project targeting CUDA and Ascend/CANN. A web console connects model baselines, kernel substitutions, quantization, KV-cache policies, runtimes, and native inference engines to recorded runs.",
+      "tags": ["Python", "CUDA / Triton", "LLM inference", "Benchmarking"],
+      "url": "https://github.com/DQR-Happy/HeteroQuantServeBench", "code": "https://github.com/DQR-Happy/HeteroQuantServeBench",
+      "items_zh": ["运行配置、生效凭据与质量对照", "内存 / 数据流 / kernel 诊断与运行关联", "项目仍在迭代，各模块支持范围见仓库"],
+      "items_en": ["Run configurations, execution evidence, and quality comparisons", "Memory, dataflow, and kernel diagnostics linked to runs", "Active development; module support is documented in the repository"]
+    },
+    {
+      "name": "Activation Functions Hub", "category": "resources", "kind": "03 / Learning resources", "state_zh": "公开资料入口", "state_en": "Public resource index",
+      "title_zh": "整理激活函数的公式、直觉与使用线索。", "title_en": "A starting point for activation functions.",
+      "desc_zh": "面向深度学习激活函数的公开资料项目，关注数学表达、直观理解与 PyTorch 使用。当前公开仓库提供项目介绍，内容持续整理。",
+      "desc_en": "A public resource project on deep-learning activation functions, with an emphasis on formulas, intuition, and PyTorch usage. The public repository currently provides the project overview; the collection is ongoing.",
+      "tags": ["Deep learning", "PyTorch", "Learning notes"],
+      "url": "https://github.com/DQR-Happy/Awesome-Activation-Functions-Hub", "code": "https://github.com/DQR-Happy/Awesome-Activation-Functions-Hub",
+      "items_zh": ["学习与资料整理项目", "以仓库实际公开内容为准"],
+      "items_en": ["A learning and resource-curation project", "Available content is reflected in the public repository"]
+    }
+  ]
+}
