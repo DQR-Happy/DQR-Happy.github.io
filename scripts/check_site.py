@@ -14,10 +14,14 @@ class Page(HTMLParser):
         self.ids, self.links, self.headings, self.errors = set(), [], [], []
         self.description = False
         self.canonical = False
+        self.language = None
+        self.alternates = {}
         self.feed(source)
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag == 'html':
+            self.language = attrs.get('lang')
         if 'id' in attrs:
             if attrs['id'] in self.ids:
                 self.errors.append('duplicate ID: ' + attrs['id'])
@@ -28,6 +32,8 @@ class Page(HTMLParser):
             self.description = bool(attrs.get('content'))
         if tag == 'link' and attrs.get('rel') == 'canonical':
             self.canonical = True
+        if tag == 'link' and attrs.get('rel') == 'alternate':
+            self.alternates[attrs.get('hreflang')] = attrs.get('href')
         for key in ('href', 'src'):
             if key in attrs:
                 self.links.append(attrs[key])
@@ -65,12 +71,23 @@ def main():
         errors.append('CNAME changed')
     if not (ROOT / '.nojekyll').is_file():
         errors.append('.nojekyll missing')
-    if len(pages) != 17:
-        errors.append(f'Expected 16 content pages + 404, got {len(pages)}')
+    if len(pages) != 25:
+        errors.append(f'Expected 16 content pages + 8 legacy redirects + 404, got {len(pages)}')
     for path in pages:
-        if path.name != '404.html' and 'en' not in path.relative_to(ROOT).parts:
-            if ROOT / 'en' / path.relative_to(ROOT) not in pages:
-                errors.append(f'English counterpart missing for {path}')
+        relative = path.relative_to(ROOT)
+        if path.name == '404.html' or relative.parts[0] == 'en':
+            continue
+        chinese = relative.parts[0] == 'zh'
+        english_path = Path(*relative.parts[1:]) if chinese else relative
+        counterpart = ROOT / english_path if chinese else ROOT / 'zh' / relative
+        if counterpart not in pages:
+            errors.append(f'Language counterpart missing for {path}')
+        if pages[path].language != ('zh-CN' if chinese else 'en'):
+            errors.append(f'Incorrect document language for {path}')
+        parent = english_path.parent.as_posix()
+        default = 'https://dengqirui.me/' + (parent + '/' if parent != '.' else '')
+        if pages[path].alternates.get('x-default') != default:
+            errors.append(f'Incorrect default-language alternate for {path}')
     for filename in ('profile.json', 'notes.json'):
         json.loads((ROOT / 'content' / filename).read_text())
     if errors:

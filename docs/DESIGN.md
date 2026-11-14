@@ -2,7 +2,7 @@
 
 Purpose: let collaborators and engineering teams understand DQR-Happy's background, inspect a research contribution, and reach public implementations or contact information.
 
-Routes: Chinese root and English `/en/`; both have home, research, projects, notes, about, and three technical articles. Language switching preserves the current page. A 404 page provides recovery.
+Routes: English is the default at the root; Chinese lives under `/zh/`. Both have home, research, projects, notes, about, and three technical articles. Language switching preserves the current page. Legacy `/en/` URLs redirect to the corresponding English root URL, retaining query parameters and fragments. The default-language metadata and 404 page are English.
 
 Visual language: pearl white / graphite with muted slate-blue, lilac-gray, and dusty-rose accents, editorial serif Latin display type, and system Chinese/body fonts. Hierarchy comes from borders, alignment, spacing, and relevant diagrams. The encoding figure is explicitly schematic. Performance values have context and source links.
 

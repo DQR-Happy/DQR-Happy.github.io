@@ -25,7 +25,7 @@ def field(obj, key, lang):
 
 
 def url(lang, page=''):
-    return ('/en/' if lang == 'en' else '/') + (page.strip('/') + '/' if page else '')
+    return ('/' if lang == 'en' else '/zh/') + (page.strip('/') + '/' if page else '')
 
 
 def arrow():
@@ -67,7 +67,7 @@ def document(lang, page, title, description, body):
     return f'''<!doctype html>
 <html lang="{'en' if lang == 'en' else 'zh-CN'}" class="no-js"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark">
 <title>{esc(title)}</title><meta name="description" content="{esc(description)}"><meta name="author" content="DQR-Happy"><meta name="theme-color" content="#f6f5f8">
-<link rel="canonical" href="{ORIGIN}{path}"><link rel="alternate" hreflang="{'zh-CN' if lang == 'en' else 'en'}" href="{ORIGIN}{alternate}"><link rel="alternate" hreflang="{'en' if lang == 'en' else 'zh-CN'}" href="{ORIGIN}{path}"><link rel="alternate" hreflang="x-default" href="{ORIGIN}{url('zh', page)}">
+<link rel="canonical" href="{ORIGIN}{path}"><link rel="alternate" hreflang="{'zh-CN' if lang == 'en' else 'en'}" href="{ORIGIN}{alternate}"><link rel="alternate" hreflang="{'en' if lang == 'en' else 'zh-CN'}" href="{ORIGIN}{path}"><link rel="alternate" hreflang="x-default" href="{ORIGIN}{url('en', page)}">
 <meta property="og:type" content="website"><meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(description)}"><meta property="og:url" content="{ORIGIN}{path}"><meta property="og:site_name" content="DQR-Happy"><meta name="twitter:card" content="summary">
 <link rel="icon" href="/assets/favicon.svg?v=slate-lilac-1" type="image/svg+xml"><link rel="stylesheet" href="/assets/site.css?v=slate-lilac-1"><script src="/assets/site.js?v=slate-lilac-1" defer></script>
 <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False)}</script></head><body>{header(lang, page)}<main id="main" class="wrap">{body}</main>{footer(lang)}</body></html>'''
@@ -182,6 +182,16 @@ def write(lang, page, title, description, body):
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(document(lang, page, title, description, body), encoding='utf-8')
     PAGES.append(url(lang, page))
+    if lang == 'en':
+        # Keep previously published /en/ links working, including query and fragment.
+        destination = url('en', page)
+        alias = ROOT / 'en' / page / 'index.html'
+        alias.parent.mkdir(parents=True, exist_ok=True)
+        moved = heading('en', 'Redirect', 'This page has moved.', 'Continue to the English page at its new address.')
+        redirect = document('en', page, title, description, moved + '<div class="content-section">' + link(destination, 'Continue', 'button') + '</div>')
+        refresh = f'<meta http-equiv="refresh" content="0;url={esc(destination)}"><meta name="robots" content="noindex">'
+        script = '<script>location.replace(' + json.dumps(destination) + '+location.search+location.hash);</script>'
+        alias.write_text(redirect.replace('</head>', refresh + script + '</head>'), encoding='utf-8')
 
 
 def main():
@@ -191,8 +201,8 @@ def main():
             write(lang, page, tr(lang, zh, en), tr(lang, zh, en) + ' · DQR-Happy', render(lang))
         for note in NOTES:
             write(lang, 'notes/' + note['slug'], field(note, 'title', lang), field(note, 'dek', lang), note_page(note, lang))
-    missing = heading('zh', '404 / Not found', '这一页暂时没有内容。', 'This page could not be found. You can return to the homepage or explore the public projects.')
-    not_found = document('zh', '', '页面不存在', 'Page not found', missing + '<div class="content-section">' + link('/', '返回首页 / Back home', 'button') + '</div>')
+    missing = heading('en', '404 / Not found', 'This page could not be found.', 'Return to the homepage or explore the public projects.')
+    not_found = document('en', '', 'Page not found', 'Page not found', missing + '<div class="content-section">' + link('/', 'Back home', 'button') + '</div>')
     not_found = not_found.replace('<title>DQR-Happy — GPU Systems &amp; AI Infrastructure</title>', '<title>404 — DQR-Happy</title>')
     not_found = not_found.replace('<meta name="author"', '<meta name="robots" content="noindex"><meta name="author"')
     (ROOT / '404.html').write_text(not_found, encoding='utf-8')

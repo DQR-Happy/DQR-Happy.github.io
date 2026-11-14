@@ -4,6 +4,8 @@ Personal research and engineering website: **[dengqirui.me](https://dengqirui.me
 
 A bilingual, accessible, dependency-free static site published with GitHub Pages.
 
+English is served by default at `/`; Chinese is available at `/zh/`. The language switch preserves the page. Previously published `/en/` URLs redirect to their English root equivalents.
+
 ## Develop
 
 Python 3.9+; no installation step. Serve this repository, not its parent folder.
