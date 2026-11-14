@@ -1,4 +1,4 @@
-# Qirui Deng · 邓骐睿
+# DQR-Happy
 
 Personal research and engineering website: **[dengqirui.me](https://dengqirui.me/)**.
 
@@ -24,11 +24,11 @@ Open `http://127.0.0.1:18765/`.
 | `content/notes.json` | Bilingual technical notes |
 | `scripts/build.py` | Shared templates, research table, education and biography |
 | `assets/site.css` | Responsive layout, theme tokens, print styles |
-| `assets/site.js` | Theme, menu, filtering, copy and print actions |
+| `assets/site.js` | Theme, menu, filtering and print actions |
 | `docs/CONTENT_SOURCES.md` | Content provenance and claim boundaries |
 | `docs/DESIGN.md` | Design and behavior contract |
 
-Rebuild after editing and commit sources together with generated pages. Reported results must retain their conditions and source links. Update citation metadata once proceedings are published.
+Rebuild after editing and commit sources together with generated pages. Reported results must retain their conditions and source links.
 
 ## Publish
 
