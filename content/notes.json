@@ -1,38 +1,141 @@
 [
   {
-    "slug": "timing-boundaries", "category": "Measurement", "date": "2026-11-15", "minutes": 4,
-    "title_zh": "性能计时：先定义终点，再讨论快慢", "title_en": "Define the endpoint before comparing performance",
-    "dek_zh": "Kernel 时间、生成时间与完整采集时间，回答的是三个不同的问题。", "dek_en": "Kernel time, generation time, and complete collection time answer different questions.",
+    "slug": "cmake-grpc-build-debugging",
+    "category": "Build systems",
+    "date": "2026-11-16",
+    "minutes": 7,
+    "title_zh": "一次 CMake 与 gRPC 构建故障的排查",
+    "title_en": "Debugging a CMake and gRPC build",
+    "dek_zh": "从依赖查找、代码生成到头文件与链接错误的工程复盘。",
+    "dek_en": "A build failure traced through dependency discovery, code generation, headers, and linking.",
+    "markdown_en": "content/articles/cmake-grpc-build-debugging.en.md",
     "sections": [
-      {"heading_zh": "比较什么，就把什么计入时间", "heading_en": "Time the work your claim is about", "body_zh": "一个 GPU kernel 更快，不一定意味着一次请求更快。同步、主机调度、内存拷贝和文件输出，都可能改变端到端结果。评价追踪系统时，如果目标是得到可用的完整 trace，计时终点就应包含最后一份数据写出并关闭文件，而不只是模型生成结束。", "body_en": "A faster GPU kernel does not necessarily make a request faster. Synchronization, host scheduling, transfers, and file output can change the end-to-end result. If a tracing system is evaluated on delivering a complete trace, its endpoint should include the final output and file close, rather than stopping at the end of generation."},
-      {"heading_zh": "分阶段解释，总时间下结论", "heading_en": "Use phases to explain the total", "body_zh": "可以将总时间拆成 prefill / 首 token、decode 和 trace drain 等阶段，定位开销落在哪里。但流水线中的编码、拷贝和计算可能重叠，不能把各操作单独测得的耗时简单相加。阶段边界必须在同一次运行中定义清楚，总时间仍是判断完整请求成本的依据。", "body_en": "Prefill / first-token, decode, and trace-drain phases help locate overhead. However, encoding, transfers, and computation can overlap in a pipeline. Their separately measured durations cannot simply be added. Define phase boundaries within the same run and retain the complete-request total as the basis for the claim."},
-      {"heading_zh": "让正确性验证和性能测量各司其职", "heading_en": "Separate correctness validation from performance measurement", "body_zh": "完整字段比对、额外的原始记录 oracle 与全量哈希，适合独立的正确性运行。算法实际路径需要的范围检查、格式检查和 raw 回退，则必须保留在性能路径中。不要从另一轮诊断时间里减掉某项开销，拼出一个没有实际测过的结果。", "body_en": "Full-field comparisons, an extra raw-record oracle, and whole-output hashes belong in dedicated correctness runs. Range checks, format checks, and raw fallback required by the algorithm remain part of its timed path. Subtracting a cost measured in a different diagnostic run does not produce a measured performance result."},
-      {"heading_zh": "一份最小可用的测量记录", "heading_en": "A useful minimum measurement record", "body_zh": "记录硬件与软件版本、模型与输入身份、精度、捕获范围、预热、重复单位、方法顺序、计时起止点、失败尝试和输出体积。区分串行 raw 与异步 raw，也区分采集运行与离线分析运行。同一个数字，只有在这些边界清楚时才有比较意义。", "body_en": "Record hardware and software versions, model and input identities, precision, capture scope, warm-up, the repetition unit, method order, timing boundaries, failed attempts, and output size. Distinguish serial raw from asynchronous raw, and collection from offline analysis. A number becomes comparable only when these boundaries are explicit."}
+      {
+        "heading_zh": "关于这篇文章",
+        "heading_en": "About this article",
+        "body_zh": "本文英文版整理自 2025 年的 CSDN 原文，复盘 gRPC、Protobuf 和 matio/HDF5 的构建排障，并修订了部分技术表述。原始环境的完整版本信息未记录。",
+        "body_en": "The full revised article is available in English."
+      }
     ],
-    "source": "https://github.com/DQR-Happy/ERETrace/tree/main/results/paper", "source_label_zh": "ERETrace 公开评估数据", "source_label_en": "ERETrace public evaluation data"
+    "source": "https://blog.csdn.net/ruiqideng/article/details/151805376",
+    "source_label_zh": "CSDN 中文原文",
+    "source_label_en": "Original Chinese article on CSDN"
   },
   {
-    "slug": "lossless-tracing", "category": "GPU observability", "date": "2026-11-15", "minutes": 4,
-    "title_zh": "无损追踪，究竟要保留什么？", "title_en": "What does a lossless trace need to preserve?",
-    "dek_zh": "文件变小只是结果。真正的约束，是每条记录仍然能够被精确解释。", "dek_en": "A smaller file is the outcome. Exact interpretation of every record is the constraint.",
+    "slug": "timing-boundaries",
+    "category": "Measurement",
+    "date": "2026-11-15",
+    "minutes": 4,
+    "title_zh": "性能计时：先定义终点，再讨论快慢",
+    "title_en": "Define the endpoint before comparing performance",
+    "dek_zh": "Kernel 时间、生成时间与完整采集时间，回答的是三个不同的问题。",
+    "dek_en": "Kernel time, generation time, and complete collection time answer different questions.",
     "sections": [
-      {"heading_zh": "先约定记录的语义", "heading_en": "Start with record semantics", "body_zh": "无损不是一个脱离捕获范围的标签。首先要声明哪些 kernel、哪些执行单元、哪些字段被记录，以及字段的精度、记录顺序和归属。只有在同一份捕获合同下，编码前后的逐条精确恢复才有意义。减少捕获范围或改成汇总统计，回答的是另一类问题。", "body_en": "Lossless is meaningful only within a stated capture scope. Specify the kernels, execution units, fields, precision, order, and ownership being recorded. Exact record-by-record recovery then becomes a concrete requirement. Narrowing the scope or replacing records with aggregate statistics changes the question."},
-      {"heading_zh": "利用参考关系，而不是牺牲精度", "heading_en": "Exploit references without discarding precision", "body_zh": "同一执行上下文中的记录可能共享可用的参考信息。ERETrace 利用 SM / CTA 参考关系表达原始字段，减少重复表示。参考和残差必须足以恢复原值；当窄字段的范围条件不满足时，受检 raw 回退保留完整记录。这里的关键是表示方式变化，而不是将时间戳近似化。", "body_en": "Records in an execution context can share useful reference information. ERETrace uses SM / CTA references to reduce redundant representations of original fields. References and residuals must recover the original values. Checked raw fallback preserves complete records when narrow-field range conditions fail. The representation changes; timestamp precision does not."},
-      {"heading_zh": "编码器之外，还有系统成本", "heading_en": "There is a system around the codec", "body_zh": "更高的压缩率不必然带来更低的采集延迟。参考生成、编码、缓冲管理、D2H 与输出都有成本，也可能相互重叠。方法需要同时考虑有界缓冲、回退路径和请求结束后的 drain，才能把表示收益转化为实际工作流收益。", "body_en": "A better compression ratio does not guarantee lower collection latency. Reference construction, encoding, buffering, D2H transfers, and output all have costs and may overlap. Bounded buffers, fallback paths, and the final drain matter when turning a representation benefit into a workflow benefit."},
-      {"heading_zh": "观测结果也有解释边界", "heading_en": "Observed records have interpretation limits", "body_zh": "warp 时间与 SM 归属可以支持执行行为分析，却不等同于设备全部物理访存。地址重复不能直接解释成 cache miss，显式拷贝字节也不是 kernel 的 DRAM 流量。研究结论需要回到实际探针记录的字段；需要硬件计数器的问题，应使用对应诊断工具补充。", "body_en": "Warp timing and SM attribution support execution analysis, but do not represent all physical memory traffic. Repeated addresses do not directly imply cache misses, and explicit copy bytes are not kernel DRAM traffic. Conclusions should follow the fields the probe actually records; hardware-counter questions require the corresponding diagnostic tools."}
+      {
+        "heading_zh": "比较什么，就把什么计入时间",
+        "heading_en": "Time the work your claim is about",
+        "body_zh": "一个 GPU kernel 更快，不一定意味着一次请求更快。同步、主机调度、内存拷贝和文件输出，都可能改变端到端结果。评价追踪系统时，如果目标是得到可用的完整 trace，计时终点就应包含最后一份数据写出并关闭文件，而不只是模型生成结束。",
+        "body_en": "A faster GPU kernel does not necessarily make a request faster. Synchronization, host scheduling, transfers, and file output can change the end-to-end result. If a tracing system is evaluated on delivering a complete trace, its endpoint should include the final output and file close, rather than stopping at the end of generation."
+      },
+      {
+        "heading_zh": "分阶段解释，总时间下结论",
+        "heading_en": "Use phases to explain the total",
+        "body_zh": "可以将总时间拆成 prefill / 首 token、decode 和 trace drain 等阶段，定位开销落在哪里。但流水线中的编码、拷贝和计算可能重叠，不能把各操作单独测得的耗时简单相加。阶段边界必须在同一次运行中定义清楚，总时间仍是判断完整请求成本的依据。",
+        "body_en": "Prefill / first-token, decode, and trace-drain phases help locate overhead. However, encoding, transfers, and computation can overlap in a pipeline. Their separately measured durations cannot simply be added. Define phase boundaries within the same run and retain the complete-request total as the basis for the claim."
+      },
+      {
+        "heading_zh": "让正确性验证和性能测量各司其职",
+        "heading_en": "Separate correctness validation from performance measurement",
+        "body_zh": "完整字段比对、额外的原始记录 oracle 与全量哈希，适合独立的正确性运行。算法实际路径需要的范围检查、格式检查和 raw 回退，则必须保留在性能路径中。不要从另一轮诊断时间里减掉某项开销，拼出一个没有实际测过的结果。",
+        "body_en": "Full-field comparisons, an extra raw-record oracle, and whole-output hashes belong in dedicated correctness runs. Range checks, format checks, and raw fallback required by the algorithm remain part of its timed path. Subtracting a cost measured in a different diagnostic run does not produce a measured performance result."
+      },
+      {
+        "heading_zh": "一份最小可用的测量记录",
+        "heading_en": "A useful minimum measurement record",
+        "body_zh": "记录硬件与软件版本、模型与输入身份、精度、捕获范围、预热、重复单位、方法顺序、计时起止点、失败尝试和输出体积。区分串行 raw 与异步 raw，也区分采集运行与离线分析运行。同一个数字，只有在这些边界清楚时才有比较意义。",
+        "body_en": "Record hardware and software versions, model and input identities, precision, capture scope, warm-up, the repetition unit, method order, timing boundaries, failed attempts, and output size. Distinguish serial raw from asynchronous raw, and collection from offline analysis. A number becomes comparable only when these boundaries are explicit."
+      }
     ],
-    "source": "https://dengqirui.me/ERETrace/", "source_label_zh": "ERETrace 方法与实现", "source_label_en": "ERETrace method and implementation"
+    "source": "https://github.com/DQR-Happy/ERETrace/tree/main/results/paper",
+    "source_label_zh": "ERETrace 公开评估数据",
+    "source_label_en": "ERETrace public evaluation data"
   },
   {
-    "slug": "inference-evidence", "category": "Inference systems", "date": "2026-11-15", "minutes": 3,
-    "title_zh": "推理优化：从配置选项走到生效证据", "title_en": "From an optimization option to execution evidence",
-    "dek_zh": "打开一个开关，并不代表想要的优化真的进入了执行路径。", "dek_en": "Selecting an option does not prove the intended optimization ran.",
+    "slug": "lossless-tracing",
+    "category": "GPU observability",
+    "date": "2026-11-15",
+    "minutes": 4,
+    "title_zh": "无损追踪，究竟要保留什么？",
+    "title_en": "What does a lossless trace need to preserve?",
+    "dek_zh": "文件变小只是结果。真正的约束，是每条记录仍然能够被精确解释。",
+    "dek_en": "A smaller file is the outcome. Exact interpretation of every record is the constraint.",
     "sections": [
-      {"heading_zh": "区分 requested、resolved 与 effective", "heading_en": "Distinguish requested, resolved, and effective", "body_zh": "用户请求的配置、运行时解析后的方案和真正执行的实现，可能并不一致。某个低精度或融合选项可能因为形状、设备能力、制品缺失或版本限制而回退。比较性能前，应能定位实际加载的实现、执行站点、调用凭据与回退原因。", "body_en": "The requested configuration, the runtime-resolved plan, and the implementation that actually executes can differ. Precision or fusion options may fall back because of shapes, device capabilities, missing artifacts, or version constraints. Before comparing performance, identify the loaded implementation, execution sites, call evidence, and fallback reasons."},
-      {"heading_zh": "一条可追溯的对照链", "heading_en": "Build a traceable comparison", "body_zh": "为模型、分词器、输入、制品与源码保留身份信息。固定输出预算和解码策略，记录实际输入 / 输出 token 数，将结果关联到同一个运行 ID。诊断记录用于解释机制，独立性能运行用于估计速度，质量运行用于检查数值与任务表现。", "body_en": "Retain identities for the model, tokenizer, input, artifacts, and source. Fix output budgets and decoding policies, record actual input / output token counts, and associate results with a run ID. Diagnostic runs explain mechanisms; independent performance runs estimate speed; quality runs evaluate numerical and task behavior."},
-      {"heading_zh": "一致，不等于正确", "heading_en": "Agreement is not correctness", "body_zh": "两个实现输出完全相同，只能说明它们在该任务上保持一致，不能证明答案正确。固定答案任务可以单独评分，开放生成则需要适合任务的评价。低比特权重文件的生成，也不能自动证明实际部署已经使用低比特计算。", "body_en": "Matching outputs establish agreement on that task, not correctness. Fixed-answer tasks can be scored separately; open-ended generation needs a task-appropriate evaluation. Producing a low-bit weight artifact likewise does not prove that deployment uses low-bit computation."},
-      {"heading_zh": "把缺失状态留在系统里", "heading_en": "Keep missing evidence visible", "body_zh": "没有可用的多 GPU、缺失计数器权限或某种优化尚未接入时，系统应该明确表达边界。把缺失指标记为零，或让演示数据混进真实运行，会使后续的比较失去意义。好的实验平台不仅展示收益，也能让失败、回退和未完成的验证留有位置。", "body_en": "Unavailable multi-GPU hardware, missing counter permissions, and unimplemented optimizations should have explicit states. Replacing missing metrics with zero or mixing demonstration data into real runs makes later comparisons unreliable. An experiment platform should preserve room for failures, fallback, and incomplete validation alongside improvements."}
+      {
+        "heading_zh": "先约定记录的语义",
+        "heading_en": "Start with record semantics",
+        "body_zh": "无损不是一个脱离捕获范围的标签。首先要声明哪些 kernel、哪些执行单元、哪些字段被记录，以及字段的精度、记录顺序和归属。只有在同一份捕获合同下，编码前后的逐条精确恢复才有意义。减少捕获范围或改成汇总统计，回答的是另一类问题。",
+        "body_en": "Lossless is meaningful only within a stated capture scope. Specify the kernels, execution units, fields, precision, order, and ownership being recorded. Exact record-by-record recovery then becomes a concrete requirement. Narrowing the scope or replacing records with aggregate statistics changes the question."
+      },
+      {
+        "heading_zh": "利用参考关系，而不是牺牲精度",
+        "heading_en": "Exploit references without discarding precision",
+        "body_zh": "同一执行上下文中的记录可能共享可用的参考信息。ERETrace 利用 SM / CTA 参考关系表达原始字段，减少重复表示。参考和残差必须足以恢复原值；当窄字段的范围条件不满足时，受检 raw 回退保留完整记录。这里的关键是表示方式变化，而不是将时间戳近似化。",
+        "body_en": "Records in an execution context can share useful reference information. ERETrace uses SM / CTA references to reduce redundant representations of original fields. References and residuals must recover the original values. Checked raw fallback preserves complete records when narrow-field range conditions fail. The representation changes; timestamp precision does not."
+      },
+      {
+        "heading_zh": "编码器之外，还有系统成本",
+        "heading_en": "There is a system around the codec",
+        "body_zh": "更高的压缩率不必然带来更低的采集延迟。参考生成、编码、缓冲管理、D2H 与输出都有成本，也可能相互重叠。方法需要同时考虑有界缓冲、回退路径和请求结束后的 drain，才能把表示收益转化为实际工作流收益。",
+        "body_en": "A better compression ratio does not guarantee lower collection latency. Reference construction, encoding, buffering, D2H transfers, and output all have costs and may overlap. Bounded buffers, fallback paths, and the final drain matter when turning a representation benefit into a workflow benefit."
+      },
+      {
+        "heading_zh": "观测结果也有解释边界",
+        "heading_en": "Observed records have interpretation limits",
+        "body_zh": "warp 时间与 SM 归属可以支持执行行为分析，却不等同于设备全部物理访存。地址重复不能直接解释成 cache miss，显式拷贝字节也不是 kernel 的 DRAM 流量。研究结论需要回到实际探针记录的字段；需要硬件计数器的问题，应使用对应诊断工具补充。",
+        "body_en": "Warp timing and SM attribution support execution analysis, but do not represent all physical memory traffic. Repeated addresses do not directly imply cache misses, and explicit copy bytes are not kernel DRAM traffic. Conclusions should follow the fields the probe actually records; hardware-counter questions require the corresponding diagnostic tools."
+      }
     ],
-    "source": "https://github.com/DQR-Happy/HeteroQuantServeBench", "source_label_zh": "HeteroQuantServeBench 项目说明", "source_label_en": "HeteroQuantServeBench documentation"
+    "source": "https://dengqirui.me/ERETrace/",
+    "source_label_zh": "ERETrace 方法与实现",
+    "source_label_en": "ERETrace method and implementation"
+  },
+  {
+    "slug": "inference-evidence",
+    "category": "Inference systems",
+    "date": "2026-11-15",
+    "minutes": 3,
+    "title_zh": "推理优化：从配置选项走到生效证据",
+    "title_en": "From an optimization option to execution evidence",
+    "dek_zh": "打开一个开关，并不代表想要的优化真的进入了执行路径。",
+    "dek_en": "Selecting an option does not prove the intended optimization ran.",
+    "sections": [
+      {
+        "heading_zh": "区分 requested、resolved 与 effective",
+        "heading_en": "Distinguish requested, resolved, and effective",
+        "body_zh": "用户请求的配置、运行时解析后的方案和真正执行的实现，可能并不一致。某个低精度或融合选项可能因为形状、设备能力、制品缺失或版本限制而回退。比较性能前，应能定位实际加载的实现、执行站点、调用凭据与回退原因。",
+        "body_en": "The requested configuration, the runtime-resolved plan, and the implementation that actually executes can differ. Precision or fusion options may fall back because of shapes, device capabilities, missing artifacts, or version constraints. Before comparing performance, identify the loaded implementation, execution sites, call evidence, and fallback reasons."
+      },
+      {
+        "heading_zh": "一条可追溯的对照链",
+        "heading_en": "Build a traceable comparison",
+        "body_zh": "为模型、分词器、输入、制品与源码保留身份信息。固定输出预算和解码策略，记录实际输入 / 输出 token 数，将结果关联到同一个运行 ID。诊断记录用于解释机制，独立性能运行用于估计速度，质量运行用于检查数值与任务表现。",
+        "body_en": "Retain identities for the model, tokenizer, input, artifacts, and source. Fix output budgets and decoding policies, record actual input / output token counts, and associate results with a run ID. Diagnostic runs explain mechanisms; independent performance runs estimate speed; quality runs evaluate numerical and task behavior."
+      },
+      {
+        "heading_zh": "一致，不等于正确",
+        "heading_en": "Agreement is not correctness",
+        "body_zh": "两个实现输出完全相同，只能说明它们在该任务上保持一致，不能证明答案正确。固定答案任务可以单独评分，开放生成则需要适合任务的评价。低比特权重文件的生成，也不能自动证明实际部署已经使用低比特计算。",
+        "body_en": "Matching outputs establish agreement on that task, not correctness. Fixed-answer tasks can be scored separately; open-ended generation needs a task-appropriate evaluation. Producing a low-bit weight artifact likewise does not prove that deployment uses low-bit computation."
+      },
+      {
+        "heading_zh": "把缺失状态留在系统里",
+        "heading_en": "Keep missing evidence visible",
+        "body_zh": "没有可用的多 GPU、缺失计数器权限或某种优化尚未接入时，系统应该明确表达边界。把缺失指标记为零，或让演示数据混进真实运行，会使后续的比较失去意义。好的实验平台不仅展示收益，也能让失败、回退和未完成的验证留有位置。",
+        "body_en": "Unavailable multi-GPU hardware, missing counter permissions, and unimplemented optimizations should have explicit states. Replacing missing metrics with zero or mixing demonstration data into real runs makes later comparisons unreliable. An experiment platform should preserve room for failures, fallback, and incomplete validation alongside improvements."
+      }
+    ],
+    "source": "https://github.com/DQR-Happy/HeteroQuantServeBench",
+    "source_label_zh": "HeteroQuantServeBench 项目说明",
+    "source_label_en": "HeteroQuantServeBench documentation"
   }
 ]

@@ -2,6 +2,7 @@
 """Generate the bilingual portfolio using only the Python standard library."""
 import html
 import json
+import re
 from pathlib import Path
 from xml.sax.saxutils import escape as xml_escape
 
@@ -161,9 +162,66 @@ def notes_index(lang):
     return heading(lang, 'Field notes / Writing', tr(lang, '技术笔记', 'Field notes'), tr(lang, '将研究与工程中反复遇到的问题写清楚：如何测量、如何观测，以及如何让结论跟得上证据。', 'Working notes on recurring research and engineering questions: how to measure, what to observe, and how to keep claims connected to evidence.')) + f'<section class="content-section"><div class="notes-grid">{"".join(note_card(n, lang) for n in NOTES)}</div></section><p class="notice content-section">{tr(lang, "本站笔记为技术解释与方法总结；实验数据以所链接项目中的公开记录为准。", "These notes explain techniques and methodology. Experimental data are defined by the public records in the linked projects.")}</p>{contact(lang)}'
 
 
+def markdown_sections(path):
+    """Render the deliberately small Markdown subset used by authored notes."""
+    lines = path.read_text(encoding='utf-8').splitlines()
+    sections, current, paragraph = [], None, []
+    in_code, code = False, []
+
+    def inline(text):
+        parts = re.split(r'(`[^`]+`|\[[^\]]+\]\(https://[^\s)]+\))', text)
+        rendered = []
+        for part in parts:
+            if part.startswith('`') and part.endswith('`'):
+                rendered.append('<code>' + esc(part[1:-1]) + '</code>')
+            elif re.fullmatch(r'\[[^\]]+\]\(https://[^\s)]+\)', part):
+                label, href = part[1:].split('](', 1)
+                rendered.append('<a href="' + esc(href[:-1]) + '">' + esc(label) + '</a>')
+            else:
+                rendered.append(esc(part))
+        return ''.join(rendered)
+
+    def flush():
+        if paragraph:
+            if current is None:
+                raise ValueError('Markdown content must begin with a level-two heading')
+            current['body'].append('<p>' + inline(' '.join(paragraph)) + '</p>')
+            paragraph.clear()
+
+    for line in lines:
+        if line.startswith('```'):
+            if in_code:
+                current['body'].append('<pre><code>' + esc('\n'.join(code)) + '</code></pre>')
+                code.clear()
+                in_code = False
+            else:
+                flush()
+                in_code = True
+        elif in_code:
+            code.append(line)
+        elif line.startswith('## '):
+            flush()
+            current = {'heading': line[3:].strip(), 'body': []}
+            sections.append(current)
+        elif not line.strip():
+            flush()
+        else:
+            paragraph.append(line.strip())
+    if in_code:
+        raise ValueError('Unclosed Markdown code fence')
+    flush()
+    return sections
+
+
 def note_page(note, lang):
-    sections = ''.join(f'<section aria-labelledby="s{i}"><h2 id="s{i}">{esc(field(s, "heading", lang))}</h2><p>{esc(field(s, "body", lang))}</p></section>' for i, s in enumerate(note['sections'], 1))
-    toc = ''.join(f'<li><a href="#s{i}">{esc(field(s, "heading", lang))}</a></li>' for i, s in enumerate(note['sections'], 1))
+    if lang == 'en' and 'markdown_en' in note:
+        entries = markdown_sections(ROOT / note['markdown_en'])
+    else:
+        entries = [{'heading': field(s, 'heading', lang), 'body': ['<p>' + esc(field(s, 'body', lang)) + '</p>']} for s in note['sections']]
+    sections = ''.join(f'<section aria-labelledby="s{i}"><h2 id="s{i}">{esc(s["heading"])}</h2>{"".join(s["body"])}</section>' for i, s in enumerate(entries, 1))
+    toc = ''.join(f'<li><a href="#s{i}">{esc(s["heading"])}</a></li>' for i, s in enumerate(entries, 1))
+    if lang == 'zh' and 'markdown_en' in note:
+        sections += '<p><a href="' + url('en', 'notes/' + note['slug']) + '">Read the complete revised article in English →</a></p>'
     next_note = NOTES[(NOTES.index(note) + 1) % len(NOTES)]
     return f'''<div class="page-heading article-heading"><a class="back-link" href="{url(lang, 'notes')}">← {tr(lang, '全部笔记', 'All notes')}</a><div class="eyebrow">{note['category']}</div><h1>{esc(field(note, 'title', lang))}</h1><p class="lead">{esc(field(note, 'dek', lang))}</p><div class="note-meta"><span>DQR-Happy</span><time datetime="{note['date']}">{note['date']}</time><span>{note['minutes']} {tr(lang, '分钟阅读', 'min read')}</span></div></div>
 <div class="article-layout"><nav class="article-toc" aria-label="{tr(lang, '本文目录', 'On this page')}"><strong>{tr(lang, '本文目录', 'On this page')}</strong><ol>{toc}</ol></nav><article class="prose">{sections}<div class="article-source">{tr(lang, '相关项目与原始说明', 'Related project and documentation')}<br>{link(note['source'], field(note, 'source_label', lang))}</div><div class="article-nav">{link(url(lang, 'notes'), tr(lang, '返回笔记索引', 'Back to notes'))}{link(url(lang, 'notes/' + next_note['slug']), tr(lang, '下一篇', 'Next note'))}</div></article></div>'''

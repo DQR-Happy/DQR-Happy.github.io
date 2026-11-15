@@ -15,3 +15,5 @@ Reviewed 2026-11-15. This portfolio does not report new experiments.
 No private repositories, unpublished results, private experimental logs, phone numbers, student IDs, or recruitment preferences are included. Forks are not claimed as original projects. Personal pages use the owner’s GitHub nickname. The paper author list and inline citation block are omitted; the linked research artifact retains the official publication information.
 
 The root site does not replace the separate ERETrace project Pages site. Its CNAME and `/ERETrace/` links are retained.
+
+The CMake and gRPC build note is adapted from the owner's [CSDN article](https://blog.csdn.net/ruiqideng/article/details/151805376). The original environment versions and complete project were not recorded. Protobuf and pkg-config claims were checked against linked CMake documentation; the example code is illustrative and has not been reproduced in the original environment.

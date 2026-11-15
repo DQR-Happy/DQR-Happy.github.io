@@ -43,7 +43,7 @@ class Page(HTMLParser):
 
 def main():
     errors = []
-    pages = {path: Page(path.read_text()) for path in ROOT.rglob('*.html')}
+    pages = {path: Page(path.read_text(encoding='utf-8')) for path in ROOT.rglob('*.html') if not path.name.startswith('._')}
     external = set()
     for path, page in pages.items():
         if len(page.headings) != 1 or not page.description or not page.canonical:
@@ -71,8 +71,10 @@ def main():
         errors.append('CNAME changed')
     if not (ROOT / '.nojekyll').is_file():
         errors.append('.nojekyll missing')
-    if len(pages) != 25:
-        errors.append(f'Expected 16 content pages + 8 legacy redirects + 404, got {len(pages)}')
+    notes = json.loads((ROOT / 'content/notes.json').read_text(encoding='utf-8'))
+    expected = 3 * (5 + len(notes)) + 1
+    if len(pages) != expected:
+        errors.append(f'Expected {expected} bilingual pages, redirects and 404, got {len(pages)}')
     for path in pages:
         relative = path.relative_to(ROOT)
         if path.name == '404.html' or relative.parts[0] == 'en':
