@@ -1,5 +1,93 @@
 [
   {
+    "slug": "ascend-s9-operator-analysis",
+    "category": "Ascend C",
+    "date": "2026-11-16",
+    "minutes": 7,
+    "title_zh": "昇腾 S9 赛题：五类算子与设计权衡",
+    "title_en": "Five Ascend C operator patterns",
+    "dek_zh": "从数据搬运、广播、索引累加、布局转换和归约分析五类算子的设计权衡。",
+    "dek_en": "An engineering analysis of copying, broadcasting, indexed accumulation, layout, and reduction.",
+    "markdown_en": "content/articles/ascend-s9-operator-analysis.en.md",
+    "sections": [
+      {
+        "heading_zh": "关于这篇文章",
+        "heading_en": "About this article",
+        "body_zh": "昇腾 S9 的五类算子分析。英文版区分算子语义、可测试的优化假设和尚未验证的性能结论。",
+        "body_en": "The full revised article is available in English."
+      }
+    ],
+    "source": "https://blog.csdn.net/ruiqideng/article/details/163351391",
+    "source_label_zh": "昇腾 S9 赛题分析原文",
+    "source_label_en": "Original Chinese S9 analysis"
+  },
+  {
+    "slug": "vscode-extension-host-oom",
+    "category": "Engineering practice",
+    "date": "2026-11-16",
+    "minutes": 6,
+    "title_zh": "VS Code 扩展宿主堆内存耗尽排障",
+    "title_en": "Investigating an extension-host heap exhaustion",
+    "dek_zh": "通过日志、进程边界和配置传递排查远程开发中的扩展宿主故障。",
+    "dek_en": "A remote development failure examined through logs, process boundaries, and configuration propagation.",
+    "markdown_en": "content/articles/vscode-extension-host-oom.en.md",
+    "sections": [
+      {
+        "heading_zh": "关于这篇文章",
+        "heading_en": "About this article",
+        "body_zh": "英文版整理扩展宿主内存耗尽的日志和排查过程，区分已观察现象、缓解措施与尚未证实的根因。",
+        "body_en": "The full revised article is available in English."
+      }
+    ],
+    "source": "https://blog.csdn.net/ruiqideng/article/details/166041161",
+    "source_label_zh": "CSDN 崩溃复盘原文",
+    "source_label_en": "Original Chinese incident report"
+  },
+  {
+    "slug": "ascend-310b-cann-install",
+    "category": "Ascend C",
+    "date": "2026-11-16",
+    "minutes": 5,
+    "title_zh": "Orange Pi AI Pro 昇腾开发环境配置记录",
+    "title_en": "Setting up CANN on an Ascend 310B1 board",
+    "dek_zh": "记录 CANN 9.0.1 的安装过程、设备条件及验证范围。",
+    "dek_en": "A version-bounded account of CANN 9.0.1 installation and its verification limits.",
+    "markdown_en": "content/articles/ascend-310b-cann-install.en.md",
+    "sections": [
+      {
+        "heading_zh": "关于这篇文章",
+        "heading_en": "About this article",
+        "body_zh": "英文版整理 Orange Pi AI Pro 上 CANN 9.0.1 的安装记录。原文没有提供 ACL 或算子执行验证结果。",
+        "body_en": "The full revised article is available in English."
+      }
+    ],
+    "source": "https://blog.csdn.net/ruiqideng/article/details/163346232",
+    "source_label_zh": "CSDN 安装记录原文",
+    "source_label_en": "Original Chinese installation record"
+  },
+  {
+    "slug": "python-ml-dependency-conflict",
+    "category": "Inference engineering",
+    "date": "2026-11-16",
+    "minutes": 4,
+    "title_zh": "vLLM 与 Transformers 依赖冲突排查",
+    "title_en": "Diagnosing a Python ML dependency conflict",
+    "dek_zh": "从导入报错出发检查 Python 环境和推理框架依赖约束。",
+    "dek_en": "A version conflict between Transformers and huggingface-hub, and how to inspect the full environment.",
+    "markdown_en": "content/articles/python-ml-dependency-conflict.en.md",
+    "sections": [
+      {
+        "heading_zh": "关于这篇文章",
+        "heading_en": "About this article",
+        "body_zh": "英文版复盘 Transformers 与 huggingface-hub 的版本冲突，补充 vLLM 依赖约束及验证边界。",
+        "body_en": "The full revised article is available in English."
+      }
+    ],
+    "source": "https://blog.csdn.net/ruiqideng/article/details/159117877",
+    "source_label_zh": "CSDN 依赖冲突原文",
+    "source_label_en": "Original Chinese troubleshooting note"
+  },
+  {
     "slug": "cmake-grpc-build-debugging",
     "category": "Build systems",
     "date": "2026-11-16",

@@ -70,7 +70,7 @@ def document(lang, page, title, description, body):
 <title>{esc(title)}</title><meta name="description" content="{esc(description)}"><meta name="author" content="DQR-Happy"><meta name="theme-color" content="#f6f5f8">
 <link rel="canonical" href="{ORIGIN}{path}"><link rel="alternate" hreflang="{'zh-CN' if lang == 'en' else 'en'}" href="{ORIGIN}{alternate}"><link rel="alternate" hreflang="{'en' if lang == 'en' else 'zh-CN'}" href="{ORIGIN}{path}"><link rel="alternate" hreflang="x-default" href="{ORIGIN}{url('en', page)}">
 <meta property="og:type" content="website"><meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(description)}"><meta property="og:url" content="{ORIGIN}{path}"><meta property="og:site_name" content="DQR-Happy"><meta name="twitter:card" content="summary">
-<link rel="icon" href="/assets/favicon.svg?v=slate-lilac-1" type="image/svg+xml"><link rel="stylesheet" href="/assets/site.css?v=slate-lilac-1"><script src="/assets/site.js?v=slate-lilac-1" defer></script>
+<link rel="icon" href="/assets/favicon.svg?v=slate-lilac-1" type="image/svg+xml"><link rel="stylesheet" href="/assets/site.css?v=slate-lilac-2"><script src="/assets/site.js?v=slate-lilac-1" defer></script>
 <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False)}</script></head><body>{header(lang, page)}<main id="main" class="wrap">{body}</main>{footer(lang)}</body></html>'''
 
 
@@ -123,7 +123,7 @@ def home(lang):
 <div class="featured-details"><div class="result-pair"><div><strong>11–24%</strong><span>{tr(lang, '完整采集请求延迟降低', 'Lower complete-request latency')}</span></div><div><strong>31–33%</strong><span>{tr(lang, '无损 trace 文件缩小', 'Smaller lossless trace files')}</span></div></div><p class="feature-note">{tr(lang, '相对同配置的字段感知 nvCOMP Cascaded 采集器；RTX 3090，三个模型，B1，256 输入 / 64 输出 token。具体数据与口径见研究详情。', 'Versus the matched field-aware nvCOMP Cascaded collector; RTX 3090, three models, B1, 256 input / 64 output tokens. Data and scope are documented in Research.')}</p><div class="mini-flow" aria-label="{tr(lang, '记录、编码、采集流程', 'Record, encode, collect pipeline')}"><span>Record</span><b>→</b><span>Reference</span><b>→</b><span>Collect</span></div></div></article></section>
 <section class="section" style="padding-top:0" aria-labelledby="projects-title"><div class="section-head"><div><div class="eyebrow">Engineering & resources</div><h2 id="projects-title">{tr(lang, '把想法做成能够继续生长的系统。', 'Ideas carried into working systems.')}</h2></div>{link(url(lang, 'projects'), tr(lang, '项目索引', 'All projects'))}</div><div class="project-list">{rows}</div></section>
 <section class="two-cols approach" aria-labelledby="approach-title"><div class="section-head"><div class="eyebrow">How I work</div><h2 id="approach-title">{tr(lang, '从现象，到机制，<br>再回到真实工作流。', 'From observations to mechanisms,<br>back to real workflows.')}</h2><p>{tr(lang, '硬件背景让我关注执行细节；系统研究让我追问，这些细节如何影响真实任务。', 'A hardware background draws me to execution details. Systems research asks how those details change a real task.')}</p>{link(url(lang, 'about'), tr(lang, '背景与研究兴趣', 'Background & interests'))}</div><div>{principles_html}</div></section>
-<section class="section" aria-labelledby="notes-title"><div class="section-head"><div><div class="eyebrow">Field notes</div><h2 id="notes-title">{tr(lang, '关于测量、追踪与推理的技术笔记。', 'Notes on measurement, tracing, and inference.')}</h2></div>{link(url(lang, 'notes'), tr(lang, '全部笔记', 'All notes'))}</div><div class="notes-grid">{''.join(note_card(n, lang) for n in NOTES)}</div></section>{contact(lang)}'''
+<section class="section" aria-labelledby="notes-title"><div class="section-head"><div><div class="eyebrow">Field notes</div><h2 id="notes-title">{tr(lang, '关于测量、追踪与推理的技术笔记。', 'Notes on measurement, tracing, and inference.')}</h2></div>{link(url(lang, 'notes'), tr(lang, '全部笔记', 'All notes'))}</div><div class="notes-grid">{''.join(note_card(n, lang) for n in NOTES[:3])}</div></section>{contact(lang)}'''
 
 
 def research(lang):
@@ -221,9 +221,11 @@ def note_page(note, lang):
     sections = ''.join(f'<section aria-labelledby="s{i}"><h2 id="s{i}">{esc(s["heading"])}</h2>{"".join(s["body"])}</section>' for i, s in enumerate(entries, 1))
     toc = ''.join(f'<li><a href="#s{i}">{esc(s["heading"])}</a></li>' for i, s in enumerate(entries, 1))
     if lang == 'zh' and 'markdown_en' in note:
-        sections += '<p><a href="' + url('en', 'notes/' + note['slug']) + '">Read the complete revised article in English →</a></p>'
+        sections += '<p><a href="' + url('en', 'notes/' + note['slug']) + '">阅读全文（英文） →</a></p>'
     next_note = NOTES[(NOTES.index(note) + 1) % len(NOTES)]
-    return f'''<div class="page-heading article-heading"><a class="back-link" href="{url(lang, 'notes')}">← {tr(lang, '全部笔记', 'All notes')}</a><div class="eyebrow">{note['category']}</div><h1>{esc(field(note, 'title', lang))}</h1><p class="lead">{esc(field(note, 'dek', lang))}</p><div class="note-meta"><span>DQR-Happy</span><time datetime="{note['date']}">{note['date']}</time><span>{note['minutes']} {tr(lang, '分钟阅读', 'min read')}</span></div></div>
+    reading_time = (f'英文全文约 {note["minutes"]} 分钟阅读' if lang == 'zh' and 'markdown_en' in note
+                    else f'{note["minutes"]} {tr(lang, "分钟阅读", "min read")}')
+    return f'''<div class="page-heading article-heading"><a class="back-link" href="{url(lang, 'notes')}">← {tr(lang, '全部笔记', 'All notes')}</a><div class="eyebrow">{note['category']}</div><h1>{esc(field(note, 'title', lang))}</h1><p class="lead">{esc(field(note, 'dek', lang))}</p><div class="note-meta"><span>DQR-Happy</span><time datetime="{note['date']}">{note['date']}</time><span>{reading_time}</span></div></div>
 <div class="article-layout"><nav class="article-toc" aria-label="{tr(lang, '本文目录', 'On this page')}"><strong>{tr(lang, '本文目录', 'On this page')}</strong><ol>{toc}</ol></nav><article class="prose">{sections}<div class="article-source">{tr(lang, '相关项目与原始说明', 'Related project and documentation')}<br>{link(note['source'], field(note, 'source_label', lang))}</div><div class="article-nav">{link(url(lang, 'notes'), tr(lang, '返回笔记索引', 'Back to notes'))}{link(url(lang, 'notes/' + next_note['slug']), tr(lang, '下一篇', 'Next note'))}</div></article></div>'''
 
 

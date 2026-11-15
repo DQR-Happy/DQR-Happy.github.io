@@ -57,3 +57,4 @@ html[data-theme=dark] {
 .prose pre{max-width:100%;overflow-x:auto;padding:18px 20px;background:var(--soft);border:1px solid var(--line);font:12px/1.7 var(--mono);tab-size:4}
 .prose :not(pre)>code{font:0.9em var(--mono);overflow-wrap:anywhere}
 .prose p a{text-decoration:underline;text-underline-offset:3px}
+@media(max-width:800px){.article-layout{grid-template-columns:minmax(0,1fr)}.prose{min-width:0}}
